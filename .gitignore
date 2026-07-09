@@ -1,0 +1,45 @@
+# Python/cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Environments/build
+.env
+.venv/
+venv/
+env/
+build/
+dist/
+
+# Model artifacts
+checkpoints/
+wan_models/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+# Generated outputs
+output/
+outputs/
+videos/
+evaluation_results*/
+VBench/
+vbench2_beta_i2v/
+wandb/
+
+# Local files
+tmp*
+*.log
+*.mp4
+*.zip
+*.tar.gz
+*.npz
+*.pkl
+
