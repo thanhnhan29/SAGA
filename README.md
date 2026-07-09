@@ -50,7 +50,6 @@ SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.
   <thead>
     <tr>
       <th>Model</th>
-      <th align="center">Para.</th>
       <th align="center">SC</th>
       <th align="center">BC</th>
       <th align="center">TF</th>
@@ -62,11 +61,10 @@ SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.
   </thead>
   <tbody>
     <tr>
-      <td colspan="9"><b><i>Autoregressive-Diffusion Hybrid Models</i></b></td>
+      <td colspan="8"><b><i>Autoregressive-Diffusion Hybrid Models</i></b></td>
     </tr>
     <tr>
       <td>CausVid [26] (CVPR 2025)</td>
-      <td align="center">1.3B</td>
       <td align="center">95.91</td>
       <td align="center">96.46</td>
       <td align="center"><u>99.02</u></td>
@@ -77,7 +75,6 @@ SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.
     </tr>
     <tr>
       <td>Self-Forcing [10] (NeurIPS 2025)</td>
-      <td align="center">1.3B</td>
       <td align="center">95.60</td>
       <td align="center">96.20</td>
       <td align="center">99.00</td>
@@ -88,7 +85,6 @@ SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.
     </tr>
     <tr>
       <td>Causal-Forcing [28] (ICML 2026)</td>
-      <td align="center">1.3B</td>
       <td align="center">95.43</td>
       <td align="center">96.15</td>
       <td align="center">97.97</td>
@@ -98,11 +94,10 @@ SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.
       <td align="center">70.11</td>
     </tr>
     <tr>
-      <td colspan="9"><b><i>Our approaches</i></b></td>
+      <td colspan="8"><b><i>Our approaches</i></b></td>
     </tr>
     <tr>
       <td><b>CausVid + SAGA</b></td>
-      <td align="center">1.3B</td>
       <td align="center"><b>96.71</b></td>
       <td align="center">96.59</td>
       <td align="center">98.96</td>
@@ -113,7 +108,6 @@ SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.
     </tr>
     <tr>
       <td><b>Self-Forcing + SAGA</b></td>
-      <td align="center">1.3B</td>
       <td align="center"><u>96.63</u></td>
       <td align="center"><b>96.95</b></td>
       <td align="center"><b>99.19</b></td>
@@ -124,7 +118,6 @@ SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.
     </tr>
     <tr>
       <td><b>Causal-Forcing + SAGA</b></td>
-      <td align="center">1.3B</td>
       <td align="center">96.13</td>
       <td align="center">96.57</td>
       <td align="center">98.63</td>
