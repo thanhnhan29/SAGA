@@ -46,18 +46,98 @@ Autoregressive video diffusion models are highly efficient for streaming and lon
 
 SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.3B-parameter Wan2.1 autoregressive diffusion backbones:
 
-| Model | Para. | SC | BC | TF | MS | TQ | AQ | IQ |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| ***Autoregressive-Diffusion Hybrid Models*** | | | | | | | | |
-| CausVid [26] (CVPR 2025) | 1.3B | 95.91 | 96.46 | <u>99.02</u> | 97.81 | 97.30 | 64.18 | 67.23 |
-| Self-Forcing [10] (NeurIPS 2025) | 1.3B | 95.60 | 96.20 | 99.00 | 98.38 | 97.30 | 66.33 | 69.60 |
-| Causal-Forcing [28] (ICML 2026) | 1.3B | 95.43 | 96.15 | 97.97 | 97.52 | 96.77 | 66.82 | 70.11 |
-| ***Our approaches*** | | | | | | | | |
-| **CausVid + SAGA** | 1.3B | **96.71** | 96.59 | 98.96 | 98.04 | 97.58 | 64.39 | 67.46 |
-| **Self-Forcing + SAGA** | 1.3B | <u>96.63</u> | **96.95** | **99.19** | **98.85** | **97.91** | **66.48** | <u>70.51</u> |
-| **Causal-Forcing + SAGA** | 1.3B | 96.13 | 96.57 | 98.63 | 97.97 | 97.33 | 66.66 | 69.83 |
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th align="center">Para.</th>
+      <th align="center">SC</th>
+      <th align="center">BC</th>
+      <th align="center">TF</th>
+      <th align="center">MS</th>
+      <th align="center">TQ</th>
+      <th align="center">AQ</th>
+      <th align="center">IQ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="9"><b><i>Autoregressive-Diffusion Hybrid Models</i></b></td>
+    </tr>
+    <tr>
+      <td>CausVid [26] (CVPR 2025)</td>
+      <td align="center">1.3B</td>
+      <td align="center">95.91</td>
+      <td align="center">96.46</td>
+      <td align="center"><u>99.02</u></td>
+      <td align="center">97.81</td>
+      <td align="center">97.30</td>
+      <td align="center">64.18</td>
+      <td align="center">67.23</td>
+    </tr>
+    <tr>
+      <td>Self-Forcing [10] (NeurIPS 2025)</td>
+      <td align="center">1.3B</td>
+      <td align="center">95.60</td>
+      <td align="center">96.20</td>
+      <td align="center">99.00</td>
+      <td align="center">98.38</td>
+      <td align="center">97.30</td>
+      <td align="center">66.33</td>
+      <td align="center">69.60</td>
+    </tr>
+    <tr>
+      <td>Causal-Forcing [28] (ICML 2026)</td>
+      <td align="center">1.3B</td>
+      <td align="center">95.43</td>
+      <td align="center">96.15</td>
+      <td align="center">97.97</td>
+      <td align="center">97.52</td>
+      <td align="center">96.77</td>
+      <td align="center">66.82</td>
+      <td align="center">70.11</td>
+    </tr>
+    <tr>
+      <td colspan="9"><b><i>Our approaches</i></b></td>
+    </tr>
+    <tr>
+      <td><b>CausVid + SAGA</b></td>
+      <td align="center">1.3B</td>
+      <td align="center"><b>96.71</b></td>
+      <td align="center">96.59</td>
+      <td align="center">98.96</td>
+      <td align="center">98.04</td>
+      <td align="center">97.58</td>
+      <td align="center">64.39</td>
+      <td align="center">67.46</td>
+    </tr>
+    <tr>
+      <td><b>Self-Forcing + SAGA</b></td>
+      <td align="center">1.3B</td>
+      <td align="center"><u>96.63</u></td>
+      <td align="center"><b>96.95</b></td>
+      <td align="center"><b>99.19</b></td>
+      <td align="center"><b>98.85</b></td>
+      <td align="center"><b>97.91</b></td>
+      <td align="center"><b>66.48</b></td>
+      <td align="center"><u>70.51</u></td>
+    </tr>
+    <tr>
+      <td><b>Causal-Forcing + SAGA</b></td>
+      <td align="center">1.3B</td>
+      <td align="center">96.13</td>
+      <td align="center">96.57</td>
+      <td align="center">98.63</td>
+      <td align="center">97.97</td>
+      <td align="center">97.33</td>
+      <td align="center">66.66</td>
+      <td align="center">69.83</td>
+    </tr>
+  </tbody>
+</table>
 
 *Note: SC, BC, TF, MS, TQ, AQ, and IQ correspond to Subject Consistency, Background Consistency, Temporal Flickering, Motion Smoothness, Temporal Quality, Aesthetic Quality, and Image Quality, respectively. Best results are shown in **bold**, and second-best results are <u>underlined</u>.*
+
 
 ---
 
