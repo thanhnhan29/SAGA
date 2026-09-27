@@ -26,7 +26,8 @@
 This repository contains the official PyTorch implementation of **SAGA** (Stable Acceleration Guidance for Autoregressive Video Generation). SAGA is a training-free inference-time stabilization framework designed to eliminate temporal inconsistencies—such as flickering, motion jitter, and structural drift—commonly found in autoregressive video diffusion rollouts.
 
 ## 🔥 News
-* **2026.07.18**: Our paper is now available on [arXiv](https://arxiv.org/abs/2607.08020)!
+* **Accepted at ACCV 2026**: SAGA has been accepted for presentation at ACCV 2026.
+* **2026.07.18**: Our paper is available on [arXiv](https://arxiv.org/abs/2607.08020).
 * **2026.07.09**: The official code of SAGA is released!
 
 ---
@@ -135,14 +136,14 @@ SAGA consistently boosts temporal consistency metrics across state-of-the-art 1.
 
 ---
 
-## 📋 TODO
-- [x] Release the SAGA core inference code
-- [x] Integrate target backbone wrappers (Self-Forcing, Causal-Forcing, CausVid)
-- [ ] Release paper and project page
-- [x] Release preprint on arXiv
-- [ ] Build Web Demo (Gradio / Replicate instance)
-- [ ] Support ComfyUI node integration
-- [ ] Support more autoregressive video diffusion backbones
+## 📄 Paper and Roadmap
+
+The SAGA paper was accepted at ACCV 2026 and is available on [arXiv:2607.08020](https://arxiv.org/abs/2607.08020).
+
+Planned extensions:
+- Build a web demo (Gradio or Replicate)
+- Add ComfyUI integration
+- Support additional autoregressive video diffusion backbones
 
 
 ---
