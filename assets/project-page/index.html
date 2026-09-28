@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="SAGA: Stable Acceleration Guidance for Autoregressive Video Generation - ACCV 2026. A training-free inference-time framework that eliminates temporal inconsistencies in autoregressive video diffusion rollouts.">
+  <meta name="keywords" content="SAGA, Autoregressive Video Generation, Video Diffusion, Slepian Transform, ACCV 2026, Temporal Consistency, Kinematic Guidance">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAGA: Stable Acceleration Guidance for Autoregressive Video Generation | ACCV 2026</title>
+
+  <!-- OpenGraph / Social Media -->
+  <meta property="og:title" content="SAGA: Stable Acceleration Guidance for Autoregressive Video Generation">
+  <meta property="og:description" content="Training-free inference-time stabilization framework for autoregressive video diffusion rollouts. Accepted at ACCV 2026.">
+  <meta property="og:image" content="./static/images/saga_overview.png">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="./static/images/favicon.svg">
+
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Project Stylesheet -->
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <!-- KaTeX for crisp mathematical formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       Top Navigation Bar
+       ======================================================================== -->
+  <nav class="site-nav" role="navigation" aria-label="main navigation">
+    <div class="nav-container">
+      <a href="#" class="nav-brand">
+        <svg viewBox="0 0 64 64" fill="none">
+          <rect width="64" height="64" rx="14" fill="#0f172a"/>
+          <path d="M12 44C20 44 24 20 32 20C40 20 44 44 52 44" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M12 36C22 36 26 28 32 28C38 28 42 36 52 36" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 4"/>
+          <circle cx="32" cy="20" r="4.5" fill="#f59e0b"/>
+          <circle cx="12" cy="44" r="3.5" fill="#38bdf8"/>
+          <circle cx="52" cy="44" r="3.5" fill="#38bdf8"/>
+        </svg>
+        <span>SAGA</span>
+        <span class="nav-badge">ACCV 2026</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#overview" class="nav-link">Overview</a></li>
+        <li><a href="#comparison" class="nav-link">Comparison</a></li>
+        <li><a href="#methodology" class="nav-link">Methodology</a></li>
+        <li><a href="#benchmarks" class="nav-link">Benchmarks</a></li>
+        <li><a href="#gallery" class="nav-link">Video Gallery</a></li>
+        <li><a href="#bibtex" class="nav-link">BibTeX</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="https://github.com/thanhnhan29/SAGA" target="_blank" rel="noopener noreferrer" class="btn-nav-github">
+          <i class="fab fa-github"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================================================================
+       Hero Section
+       ======================================================================== -->
+  <header class="hero-section" id="overview">
+    <div class="hero-container">
+      <div class="conference-tag">
+        <span class="conference-year">ACCV 2026</span>
+        <span class="conference-detail">Accepted paper <span aria-hidden="true">·</span> Paper ID 452</span>
+      </div>
+
+      <h1 class="paper-title">
+        <span class="gradient-text">SAGA</span>: Stable Acceleration Guidance for Autoregressive Video Generation
+      </h1>
+
+      <div class="author-list">
+        <span class="author-item"><strong><a href="https://thanhnhan29.github.io/" target="_blank">Thanh-Nhan Vo</a></strong><sup>1,2</sup><a href="mailto:vtnhan@selab.hcmus.edu.vn" class="author-mail-icon" title="Email: vtnhan@selab.hcmus.edu.vn" aria-label="Email Thanh-Nhan Vo"><i class="fas fa-envelope"></i></a></span>
+        <span class="author-item"><strong>Trong-Thuan Nguyen</strong><sup>1,2</sup><a href="mailto:ntrthuan@hcmus.edu.vn" class="author-mail-icon" title="Email: ntrthuan@hcmus.edu.vn" aria-label="Email Trong-Thuan Nguyen"><i class="fas fa-envelope"></i></a></span>
+        <span class="author-item"><strong>Trung-Hoang Le</strong><sup>1,2</sup><a href="mailto:lthoang@hcmus.edu.vn" class="author-mail-icon" title="Email: lthoang@hcmus.edu.vn" aria-label="Email Trung-Hoang Le"><i class="fas fa-envelope"></i></a></span>
+        <span class="author-item"><strong>Tam V. Nguyen</strong><sup>3</sup><a href="mailto:tnguyen1@udayton.edu" class="author-mail-icon" title="Email: tnguyen1@udayton.edu" aria-label="Email Tam V. Nguyen"><i class="fas fa-envelope"></i></a></span>
+        <span class="author-item"><strong>Minh-Triet Tran</strong><sup>1,2</sup><a href="mailto:tmtriet@fit.hcmus.edu.vn" class="author-mail-icon" title="Email: tmtriet@fit.hcmus.edu.vn" aria-label="Email Minh-Triet Tran"><i class="fas fa-envelope"></i></a></span>
+      </div>
+
+      <div class="affiliation-list">
+        <span class="affiliation-item"><sup>1</sup>University of Science, VNU-HCM, Vietnam</span>
+        <span class="affiliation-item"><sup>2</sup>Vietnam National University, Ho Chi Minh City</span>
+        <span class="affiliation-item"><sup>3</sup>University of Dayton, Ohio, U.S.A.</span>
+      </div>
+
+      <div class="author-emails-row">
+        <span><code>vtnhan@selab.hcmus.edu.vn</code>, <code>{ntrthuan, lthoang}@hcmus.edu.vn</code>, <code>tnguyen1@udayton.edu</code>, <code>tmtriet@fit.hcmus.edu.vn</code></span>
+      </div>
+
+      <div class="institution-branding">
+        <div class="institution-item">
+          <img src="./static/images/logo_hcmus.png" alt="University of Science, VNU-HCM" class="institution-logo logo-hcmus" width="1200" height="349">
+        </div>
+        <div class="institution-item">
+          <img src="./static/images/logo_vnu_hcm.png" alt="Vietnam National University, Ho Chi Minh City" class="institution-logo logo-vnu" width="5804" height="2016">
+        </div>
+        <div class="institution-item">
+          <img src="./static/images/logo_dayton.png" alt="University of Dayton" class="institution-logo logo-dayton" width="727" height="800">
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="hero-buttons">
+        <a href="./static/paper/SAGA_ACCV2026.pdf" target="_blank" class="action-btn primary">
+          <i class="fas fa-file-pdf"></i>
+          <span>Read Paper (PDF)</span>
+        </a>
+        <a href="https://arxiv.org/abs/2607.08020" target="_blank" rel="noopener noreferrer" class="action-btn">
+          <i class="ai ai-arxiv"></i>
+          <span>arXiv:2607.08020</span>
+        </a>
+        <a href="https://github.com/thanhnhan29/SAGA" target="_blank" rel="noopener noreferrer" class="action-btn">
+          <i class="fab fa-github"></i>
+          <span>Code &amp; Weights</span>
+        </a>
+        <a href="#comparison" class="action-btn">
+          <i class="fas fa-play-circle"></i>
+          <span>Interactive Demos</span>
+        </a>
+        <a href="#bibtex" class="action-btn">
+          <i class="fas fa-quote-right"></i>
+          <span>Cite BibTeX</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       Interactive Video Comparison Theater
+       ======================================================================== -->
+  <section class="theater-section" id="comparison">
+    <div class="theater-card">
+      <div class="theater-header">
+        <div class="theater-title-group">
+          <h2>
+            <i class="fas fa-columns"></i>
+            <span>Interactive Stability Comparison</span>
+          </h2>
+          <p>Watch the same prompt side by side to compare temporal stability.</p>
+        </div>
+
+        <div class="theater-controls-top">
+          <!-- Slow-Motion Speed Selector -->
+          <div class="speed-selector">
+            <span class="speed-label"><i class="fas fa-tachometer-alt"></i> Speed:</span>
+            <button class="speed-btn active" data-speed="1.0">1.0x</button>
+            <button class="speed-btn" data-speed="0.5">0.5x</button>
+            <button class="speed-btn" data-speed="0.25">0.25x</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Presets Tabs -->
+      <div class="preset-tabs-wrapper">
+        <div class="preset-tabs" id="presetTabs">
+          <!-- Dynamically populated via index.js -->
+        </div>
+      </div>
+
+      <!-- Video Viewport -->
+      <div class="theater-viewport" id="theaterViewport">
+        <div class="side-by-side-container">
+          <div class="side-video-panel">
+            <div class="video-panel-heading baseline-heading"><strong>Baseline</strong><span>Self-Forcing</span></div>
+            <div class="video-frame"><video id="sideVideoBase" muted playsinline preload="auto"></video></div>
+          </div>
+          <div class="side-video-panel">
+            <div class="video-panel-heading saga-heading"><strong>SAGA</strong><span>Ours</span></div>
+            <div class="video-frame"><video id="sideVideoSaga" muted playsinline preload="auto"></video></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Synchronized Controls Bar -->
+      <div class="video-playback-bar">
+        <button class="btn-play-pause" id="btnPlayPause" aria-label="Play/Pause">
+          <i class="fas fa-play"></i>
+        </button>
+
+        <div class="seek-track-wrapper">
+          <input type="range" class="seek-slider" id="seekSlider" min="0" max="100" value="0" step="0.1" aria-label="Video Scrub Position">
+          <span class="time-readout" id="timeDisplay">0.00 / 0.00s</span>
+        </div>
+      </div>
+
+      <!-- Active Prompt Callout -->
+      <div class="active-prompt-box">
+        <i class="fas fa-terminal prompt-icon"></i>
+        <div class="prompt-text-content">
+          <strong>Text Prompt:</strong>
+          <span id="activePromptText">Loading prompt...</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Abstract & Key Metric Highlights
+       ======================================================================== -->
+  <section class="content-section abstract-section" id="abstract">
+    <div class="abstract-card">
+      <div class="section-header abstract-header">
+        <div class="section-label">Executive Summary</div>
+        <h2 class="section-title">
+          <button class="abstract-toggle" id="abstractToggle" type="button" aria-expanded="false" aria-controls="abstractContent">
+            <span>Abstract</span>
+            <span class="abstract-toggle-action"><span id="abstractToggleLabel">Show abstract</span><i class="fas fa-chevron-down" aria-hidden="true"></i></span>
+          </button>
+        </h2>
+      </div>
+
+      <div class="abstract-content" id="abstractContent" hidden>
+        <p class="abstract-text">
+          Autoregressive video diffusion models offer compelling computational advantages for streaming and long-horizon video generation by generating latents sequentially. However, repeatedly reusing generated latents as causal context exposes a severe failure mode: small temporal perturbations accumulate across sliding windows, causing pronounced motion jitter, flickering, and semantic drift. In this work, we analyze this phenomenon from a spectral kinematic perspective and discover that discrete latent acceleration acts as a second-order temporal operator that attenuates low-frequency semantic motion while strongly magnifying high-frequency temporal perturbations.
+        </p>
+        <p class="abstract-text">
+          To address this fundamental instability, we propose <strong>SAGA</strong> (Stable Acceleration Guidance for Autoregressive Video Generation), an inference-time, training-free stabilization framework. SAGA operates via two synergistic components: (1) <strong>Discrete Slepian Projections (SG)</strong> that provide maximum energy concentration in the target frequency band under finite sliding temporal support, mitigating spectral leakage while suppressing unstable kinematic noise; and (2) <strong>Structured Autoregressive Noise Initialization (SAN)</strong>, which neutralizes adjacent-frame correlation while preserving higher-lag temporal structure. Evaluated across state-of-the-art autoregressive backbones (CausVid, Self-Forcing, and Causal-Forcing), SAGA delivers marked improvements in temporal consistency and human preference with negligible computational overhead.
+        </p>
+      </div>
+
+      <!-- Key Metrics Highlights (Always Visible) -->
+      <div class="highlight-metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-val">+0.21%</div>
+          <div class="metric-label">Latency Overhead</div>
+          <div class="metric-desc">Tested on NVIDIA RTX 5090</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-val">+0.008 GiB</div>
+          <div class="metric-label">Peak Memory</div>
+          <div class="metric-desc">Practically zero memory footprint</div>
+        </div>
+
+        <div class="metric-card success">
+          <div class="metric-val">62.7%</div>
+          <div class="metric-label">User Preference Win</div>
+          <div class="metric-desc">Pairwise human evaluation victory</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-val">97.91</div>
+          <div class="metric-label">VBench Temporal Score</div>
+          <div class="metric-desc">Consistent boost across backbones</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Methodology & Key Theoretical Insights
+       ======================================================================== -->
+  <section class="content-section" id="methodology">
+    <div class="section-header">
+      <div class="section-label">Theoretical Framework</div>
+      <h2 class="section-title">How SAGA Works</h2>
+      <p class="section-subtitle">
+        Addressing spectral instability in autoregressive video diffusion through acceleration-domain kinematics and finite-support Slepian concentration.
+      </p>
+    </div>
+
+    <!-- Core Insight Callout -->
+    <div class="key-insight-box">
+      <div class="insight-icon">
+        <i class="fas fa-lightbulb"></i>
+      </div>
+      <div class="insight-content">
+        <h3>Core Insight: Why Second-Order Acceleration?</h3>
+        <p>
+          Discrete latent acceleration $\mathbf{a}_t = \mathbf{z}_{t+1} - 2\mathbf{z}_t + \mathbf{z}_{t-1}$ corresponds to a high-pass frequency response $H(\omega) = 4\sin^2(\omega/2)$. While semantic motion and camera pans live in the low-frequency band ($\omega \to 0$), high-frequency temporal perturbations (jitter, flickering) are amplified up to <strong>4&times; in power</strong>. Regulating acceleration directly exposes and eliminates these temporal errors without blurring spatial details.
+        </p>
+      </div>
+    </div>
+
+    <!-- Dual Pillars Grid -->
+    <div class="pillars-grid">
+      <!-- Pillar 1 -->
+      <div class="pillar-card pillar-1">
+        <span class="pillar-badge">Pillar 1: Inference Guidance</span>
+        <h3 class="pillar-title">Acceleration-Domain Spectral Guidance (SG)</h3>
+        <p class="pillar-desc">
+          Because autoregressive rollout operates on short temporal chunks (sliding windows), standard Discrete Fourier Transforms (DFT) suffer from severe spectral leakage. SAGA adopts <strong>Discrete Prolate Spheroidal Sequences (DPSS / Slepian basis)</strong>, which provably maximize energy concentration in finite temporal intervals. By projecting latent acceleration onto band-limited Slepian vectors, SAGA isolates and penalizes high-frequency kinematic energy during reverse denoising.
+        </p>
+        <div class="pillar-formula">
+          $$\mathcal{E}_{\text{kin}}(\hat{\mathbf{z}}_0) = \sum_{k=K_c}^{N-1} \|\beta_k\|^2, \quad \beta_k = \mathbf{v}_k^T \mathbf{a}_t$$
+        </div>
+      </div>
+
+      <!-- Pillar 2 -->
+      <div class="pillar-card pillar-2">
+        <span class="pillar-badge">Pillar 2: Stochastic Prior</span>
+        <h3 class="pillar-title">Structured Autoregressive Noise (SAN)</h3>
+        <p class="pillar-desc">
+          SAN combines two independent, variance-preserving AR(1) streams with opposite temporal correlations. When $\theta=\pi/4$ and $\rho_{\mathrm{lf}}=-\rho_{\mathrm{hf}}=\rho$, the combined noise has zero adjacent-frame correlation, $R(1)=0$, while retaining higher-lag correlation, $R(2)=\rho^2$. Each frame remains marginally standard Gaussian.
+        </p>
+        <div class="pillar-formula">
+          $$\begin{aligned}\mathbf{z}_t &= \cos\theta\,\mathbf{z}^{\mathrm{lf}}_t + \sin\theta\,\mathbf{z}^{\mathrm{hf}}_t,\\ \mathbf{z}^{\mathrm{type}}_t &= \rho_{\mathrm{type}}\mathbf{z}^{\mathrm{type}}_{t-1} + \sqrt{1-\rho_{\mathrm{type}}^2}\,\boldsymbol{\epsilon}^{\mathrm{type}}_t.\end{aligned}$$
+        </div>
+      </div>
+    </div>
+
+    <!-- Architecture Walkthrough -->
+    <div class="architecture-showcase">
+      <!-- Figure 1: Pipeline Overview -->
+      <div class="figure-card">
+        <div class="figure-img-wrapper" data-zoomable>
+          <img src="./static/images/saga_overview.png" alt="SAGA Pipeline Workflow">
+          <span class="zoom-hint"><i class="fas fa-search-plus"></i> Click to Zoom</span>
+        </div>
+        <div class="figure-caption">
+          <strong>Figure 1: End-to-end SAGA workflow for autoregressive video generation.</strong> A frozen causal DiT rolls out latent chunks using SG (Spectral Guidance) and SAN (Structured AR Noise), subsequently decoding the stabilized trajectory $\mathbf{z}_{1:T}$ via a standard VAE decoder into high-fidelity video.
+        </div>
+      </div>
+
+      <!-- Figure 2: Detailed Framework -->
+      <div class="figure-card">
+        <div class="figure-img-wrapper" data-zoomable>
+          <img src="./static/images/saga_framework.png" alt="SAGA Detailed Architecture">
+          <span class="zoom-hint"><i class="fas fa-search-plus"></i> Click to Zoom</span>
+        </div>
+        <div class="figure-caption">
+          <strong>Figure 2: Detailed architectural mechanisms of SAGA.</strong> (Top) Structured frequency-aware noise initialization establishing a neutral motion prior; (Bottom) Inference-time spectral guidance computing high-frequency kinematic energy over discrete acceleration and guiding the denoising trajectory through Slepian projections.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Quantitative Results & Benchmarks
+       ======================================================================== -->
+  <section class="content-section" id="benchmarks">
+    <div class="section-header">
+      <div class="section-label">Empirical Evaluation</div>
+      <h2 class="section-title">Quantitative Benchmarks</h2>
+      <p class="section-subtitle">
+        Extensive benchmarking on the VBench suite and human preference studies demonstrate consistent improvements across backbones.
+      </p>
+    </div>
+
+    <!-- VBench Results Table -->
+    <div class="table-responsive-wrapper">
+      <table class="vbench-table">
+        <thead>
+          <tr>
+            <th>Model Backbone</th>
+            <th style="text-align:center;">Params</th>
+            <th style="text-align:center;">Subject (SC)</th>
+            <th style="text-align:center;">Background (BC)</th>
+            <th style="text-align:center;">Flickering (TF)</th>
+            <th style="text-align:center;">Smoothness (MS)</th>
+            <th style="text-align:center;">Temporal (TQ)</th>
+            <th style="text-align:center;">Aesthetic (AQ)</th>
+            <th style="text-align:center;">Image (IQ)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row">
+            <td colspan="9">Autoregressive-Diffusion Hybrid Baselines</td>
+          </tr>
+          <tr>
+            <td><strong>CausVid</strong> (CVPR 2025)</td>
+            <td class="num">1.3B</td>
+            <td class="num">95.91</td>
+            <td class="num">96.46</td>
+            <td class="num"><span class="second-val">99.02</span></td>
+            <td class="num">97.81</td>
+            <td class="num">97.30</td>
+            <td class="num">64.18</td>
+            <td class="num">67.23</td>
+          </tr>
+          <tr>
+            <td><strong>Self-Forcing</strong> (NeurIPS 2025)</td>
+            <td class="num">1.3B</td>
+            <td class="num">95.60</td>
+            <td class="num">96.20</td>
+            <td class="num">99.00</td>
+            <td class="num">98.38</td>
+            <td class="num">97.30</td>
+            <td class="num">66.33</td>
+            <td class="num">69.60</td>
+          </tr>
+          <tr>
+            <td><strong>Causal-Forcing</strong> (ICML 2026)</td>
+            <td class="num">1.3B</td>
+            <td class="num">95.43</td>
+            <td class="num">96.15</td>
+            <td class="num">97.97</td>
+            <td class="num">97.52</td>
+            <td class="num">96.77</td>
+            <td class="num">66.82</td>
+            <td class="num">70.11</td>
+          </tr>
+
+          <tr class="group-row">
+            <td colspan="9">Our Stabilized Backbones (+ SAGA)</td>
+          </tr>
+          <tr class="saga-row">
+            <td><strong>CausVid + SAGA</strong></td>
+            <td class="num">1.3B</td>
+            <td class="num"><span class="best-val">96.71</span></td>
+            <td class="num">96.59</td>
+            <td class="num">98.96</td>
+            <td class="num">98.04</td>
+            <td class="num">97.58</td>
+            <td class="num">64.39</td>
+            <td class="num">67.46</td>
+          </tr>
+          <tr class="saga-row">
+            <td><strong>Self-Forcing + SAGA</strong></td>
+            <td class="num">1.3B</td>
+            <td class="num"><span class="second-val">96.63</span></td>
+            <td class="num"><span class="best-val">96.95</span></td>
+            <td class="num"><span class="best-val">99.19</span></td>
+            <td class="num"><span class="best-val">98.85</span></td>
+            <td class="num"><span class="best-val">97.91</span></td>
+            <td class="num"><span class="best-val">66.48</span></td>
+            <td class="num"><span class="second-val">70.51</span></td>
+          </tr>
+          <tr class="saga-row">
+            <td><strong>Causal-Forcing + SAGA</strong></td>
+            <td class="num">1.3B</td>
+            <td class="num">96.13</td>
+            <td class="num">96.57</td>
+            <td class="num">98.63</td>
+            <td class="num">97.97</td>
+            <td class="num">97.33</td>
+            <td class="num">66.66</td>
+            <td class="num">69.83</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="table-legend">
+        <span><strong>SC:</strong> Subject Consistency</span>
+        <span><strong>BC:</strong> Background Consistency</span>
+        <span><strong>TF:</strong> Temporal Flickering</span>
+        <span><strong>MS:</strong> Motion Smoothness</span>
+        <span><strong>TQ:</strong> Temporal Quality</span>
+        <span><strong>AQ:</strong> Aesthetic Quality</span>
+        <span><strong>IQ:</strong> Image Quality</span>
+      </div>
+    </div>
+
+    <!-- Evaluation Charts -->
+    <div class="charts-grid">
+      <!-- Temporal Quality vs Horizon -->
+      <figure class="chart-card chart-card--trend">
+        <figcaption class="chart-caption">
+          <h4>Temporal Consistency vs. Rollout Horizon</h4>
+          <p>SAGA maintains superior stability over long-horizon rollouts up to 30 seconds, preventing error accumulation.</p>
+        </figcaption>
+        <div class="chart-img-wrapper" data-zoomable>
+          <img src="./static/images/saga_temporal_quality.png" alt="Temporal quality scores for SAGA and Self-Forcing at 5, 10, and 30 seconds" width="1017" height="734" loading="lazy">
+          <span class="zoom-hint"><i class="fas fa-search-plus"></i> Zoom</span>
+        </div>
+      </figure>
+
+      <!-- Human Preference With Ties -->
+      <figure class="chart-card chart-card--pairwise">
+        <figcaption class="chart-caption">
+          <h4>All Pairwise Outcomes (Including Ties)</h4>
+          <p>Comprehensive evaluation outcomes including ties (video-level: 58% SAGA vs. 34% baseline).</p>
+        </figcaption>
+        <div class="pairwise-chart">
+          <div class="pairwise-row">
+            <h5>Video level</h5>
+            <div class="pairwise-row-content">
+              <div class="pairwise-bar" role="img" aria-label="Video level: SAGA 58%, ties 8%, Self-Forcing 34%">
+                <span class="pairwise-segment pairwise-saga" style="--share: 58"></span>
+                <span class="pairwise-segment pairwise-tie" style="--share: 8"></span>
+                <span class="pairwise-segment pairwise-baseline" style="--share: 34"></span>
+              </div>
+              <div class="pairwise-values" aria-hidden="true">
+                <span><i class="pairwise-key pairwise-saga"></i>SAGA <strong>58.0%</strong> <small>(n=58)</small></span>
+                <span><i class="pairwise-key pairwise-tie"></i>Tie <strong>8.0%</strong> <small>(n=8)</small></span>
+                <span><i class="pairwise-key pairwise-baseline"></i>Self-Forcing <strong>34.0%</strong> <small>(n=34)</small></span>
+              </div>
+            </div>
+          </div>
+          <div class="pairwise-row">
+            <h5>Per vote</h5>
+            <div class="pairwise-row-content">
+              <div class="pairwise-bar" role="img" aria-label="Per vote: SAGA 40%, ties 31.6%, Self-Forcing 28.4%">
+                <span class="pairwise-segment pairwise-saga" style="--share: 40"></span>
+                <span class="pairwise-segment pairwise-tie" style="--share: 31.6"></span>
+                <span class="pairwise-segment pairwise-baseline" style="--share: 28.4"></span>
+              </div>
+              <div class="pairwise-values" aria-hidden="true">
+                <span><i class="pairwise-key pairwise-saga"></i>SAGA <strong>40.0%</strong> <small>(n=200)</small></span>
+                <span><i class="pairwise-key pairwise-tie"></i>Tie <strong>31.6%</strong> <small>(n=158)</small></span>
+                <span><i class="pairwise-key pairwise-baseline"></i>Self-Forcing <strong>28.4%</strong> <small>(n=142)</small></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
+    </div>
+
+    <!-- Efficiency Callout Banner -->
+    <div class="efficiency-banner">
+      <div class="efficiency-text">
+        <h4><i class="fas fa-microchip"></i> Negligible Inference Overhead</h4>
+        <p>
+          Because SAGA operates exclusively via closed-form Slepian linear projections and lightweight kinematic loss during denoising, it adds virtually zero computational penalty to the base generative model.
+        </p>
+      </div>
+
+      <div class="efficiency-stats">
+        <div class="stat-item">
+          <div class="stat-num">+0.21%</div>
+          <div class="stat-lbl">Latency Overhead</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">+8.2 MB</div>
+          <div class="stat-lbl">VRAM Footprint</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">0</div>
+          <div class="stat-lbl">Retraining Needed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Qualitative Video Gallery
+       ======================================================================== -->
+  <section class="content-section" id="gallery">
+    <div class="section-header">
+      <div class="section-label">Visual Gallery</div>
+      <h2 class="section-title">Diverse Generation Showcase</h2>
+      <p class="section-subtitle">
+        Hover to preview or explore how SAGA generalizes across diverse styles, camera dynamics, and long-horizon narratives.
+      </p>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="gallery-filter-tabs">
+      <button class="gallery-tab-btn active" data-filter="all">All Videos</button>
+      <button class="gallery-tab-btn" data-filter="art">Vincent van Gogh &amp; Art</button>
+      <button class="gallery-tab-btn" data-filter="scifi">Cyberpunk &amp; Sci-Fi</button>
+      <button class="gallery-tab-btn" data-filter="nature">Nature, Animals &amp; Landscapes</button>
+    </div>
+
+    <!-- Video Grid -->
+    <div class="gallery-grid">
+      <!-- Item 1: Van Gogh Beach -->
+      <div class="gallery-card" data-category="art">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/vangogh_coastal_beach.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Artistic Style</span>
+          <div class="gallery-card-prompt">"A beautiful coastal beach in spring, waves lapping on sand by Vincent van Gogh."</div>
+        </div>
+      </div>
+
+      <!-- Item 2: Van Gogh Seine -->
+      <div class="gallery-card" data-category="art">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/vangogh_seine_river.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Artistic Style</span>
+          <div class="gallery-card-prompt">"A boat sailing leisurely along the Seine River with the Eiffel Tower in background by Vincent van Gogh."</div>
+        </div>
+      </div>
+
+      <!-- Item 3: Van Gogh Selfie -->
+      <div class="gallery-card" data-category="art">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/vangogh_selfie.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Artistic Style</span>
+          <div class="gallery-card-prompt">"Cinematic shot of Van Gogh's selfie, distinctive impasto brushstrokes and vivid color palette."</div>
+        </div>
+      </div>
+
+      <!-- Item 4: Cyberpunk Beijing Robot -->
+      <div class="gallery-card" data-category="scifi">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/cyberpunk_beijing_robot.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Sci-Fi &amp; Cyberpunk</span>
+          <div class="gallery-card-prompt">"A super cool giant robot towering over neon-lit Cyberpunk Beijing with detailed reflections."</div>
+        </div>
+      </div>
+
+      <!-- Item 5: Corgi in Park Sunset -->
+      <div class="gallery-card" data-category="nature">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/corgi_park_sunset.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Animals &amp; Nature</span>
+          <div class="gallery-card-prompt">"A cute happy Corgi playing in the park at golden hour sunset with rich fur dynamics."</div>
+        </div>
+      </div>
+
+      <!-- Item 6: Two Pandas Discussing Paper -->
+      <div class="gallery-card" data-category="nature">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/pandas_academic_paper.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Nature &amp; Conceptual</span>
+          <div class="gallery-card-prompt">"Two giant pandas sitting in a cozy study room discussing an academic research paper."</div>
+        </div>
+      </div>
+
+      <!-- Item 7: Snow Rocky Mountains -->
+      <div class="gallery-card" data-category="nature">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/snow_rocky_canyon.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Landscapes</span>
+          <div class="gallery-card-prompt">"Snow blanketed rocky mountain peaks and deep canyons twisting through elevated topography."</div>
+        </div>
+      </div>
+
+      <!-- Item 8: Fantasy Landscape Rabbit -->
+      <div class="gallery-card" data-category="art">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/fantasy_rabbit_robe.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Fantasy</span>
+          <div class="gallery-card-prompt">"A whimsical fat rabbit wearing an ornate purple robe walking through a fantasy landscape."</div>
+        </div>
+      </div>
+
+      <!-- Item 9: Gwen Stacy Reading -->
+      <div class="gallery-card" data-category="scifi">
+        <div class="gallery-video-wrapper">
+          <video src="./static/videos/aesthetic/gwen_stacy_reading.mp4" loop muted playsinline></video>
+        </div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-tag">Character &amp; Animation</span>
+          <div class="gallery-card-prompt">"Gwen Stacy reading a book in a sunlit modern apartment with expressive lighting."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paper Qualitative Frame Grid Feature -->
+    <div class="paper-grid-feature">
+      <h3>Qualitative Frame Rollout Comparison (Paper Figure)</h3>
+      <p>Continuous sequential frame comparisons highlighting baseline temporal drift and deformation versus SAGA's sustained structural coherence.</p>
+      <div class="figure-img-wrapper" data-zoomable>
+        <img src="./static/images/saga_rollout_comparison_grid.png" alt="Qualitative frame comparison grid">
+        <span class="zoom-hint"><i class="fas fa-search-plus"></i> Click to Zoom Full Resolution</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       BibTeX Citation
+       ======================================================================== -->
+  <section class="content-section bibtex-section" id="bibtex">
+    <div class="section-header">
+      <div class="section-label">Citation</div>
+      <h2 class="section-title">BibTeX</h2>
+      <p class="section-subtitle">If you find SAGA useful in your research, please cite our ACCV 2026 paper.</p>
+    </div>
+
+    <div class="bibtex-wrapper">
+      <div class="bibtex-header">
+        <span>citation.bib</span>
+        <button class="btn-copy-bibtex" id="btnCopyBibtex">
+          <i class="fas fa-copy"></i>
+          <span>Copy BibTeX</span>
+        </button>
+      </div>
+      <pre class="bibtex-code" id="bibtexCode">@inproceedings{vo2026saga,
+  title     = {SAGA: Stable Acceleration Guidance for Autoregressive Video Generation},
+  author    = {Vo, Thanh-Nhan and Nguyen, Trong-Thuan and Le, Trung-Hoang and Nguyen, Tam V. and Tran, Minh-Triet},
+  booktitle = {Asian Conference on Computer Vision (ACCV)},
+  year      = {2026}
+}</pre>
+    </div>
+  </section>
+
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="toastMsg" role="alert">
+    <i class="fas fa-check-circle"></i>
+    <span class="toast-text">Copied to clipboard!</span>
+  </div>
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true" aria-label="High-resolution image viewer">
+    <div class="lightbox-content">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Close modal">&times;</button>
+      <img id="lightboxImg" src="" alt="Enlarged view">
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Footer
+       ======================================================================== -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="#overview">Overview</a>
+        <a href="#comparison">Interactive Demos</a>
+        <a href="#methodology">Methodology</a>
+        <a href="#benchmarks">Benchmarks</a>
+        <a href="https://github.com/thanhnhan29/SAGA" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://arxiv.org/abs/2607.08020" target="_blank" rel="noopener noreferrer">arXiv</a>
+      </div>
+
+      <p style="margin-bottom: 0.5rem;">
+        <strong>SAGA Project</strong> &bull; University of Science, VNU-HCM &amp; University of Dayton &bull; ACCV 2026
+      </p>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">
+        This project page template is enhanced with bespoke modern frontend engineering, dual-video synchronization, and accessible responsive styling.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Project Script Engine -->
+  <script src="./static/js/index.js"></script>
+</body>
+</html>
