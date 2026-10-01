@@ -39,7 +39,7 @@ Autoregressive video diffusion models are highly efficient for streaming and lon
 * **Acceleration-Domain Spectral Guidance (SG)**: An inference-time guidance objective based on finite-window Slepian projections (Discrete Prolate Spheroidal Sequences - DPSS) that isolates and suppresses unstable high-frequency kinematic energy during denoising.
 
 <p align="center">
-  <img src="assets/saga_framework.png" width="850" alt="SAGA Framework"/>
+  <img src="assets/project-page/static/images/saga_framework.png" width="850" alt="SAGA Framework"/>
 </p>
 
 ---
